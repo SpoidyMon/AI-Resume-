@@ -1,7 +1,12 @@
 const User=require("../model/user.model.js")
 const bcrypt=require("bcryptjs")
 const jwt=require("jsonwebtoken")
-const cookie=require("cookie-parser")
+
+const sanitizeUser = (user) => ({
+    _id: user._id,
+    username: user.username,
+    email: user.email,
+})
 
 const registerController=async(req,res)=>{
     const {username,password, email}=req.body
@@ -30,11 +35,14 @@ const registerController=async(req,res)=>{
         { expiresIn:"1d"}
     )
 
-    res.cookie("token",token)
+    res.cookie("token", token, {
+        httpOnly: true,
+        sameSite: "strict"
+    })
 
     return res.status(201).json({
         message:"User registered successfully",
-        user:newUser
+        user: sanitizeUser(newUser)
     })
 }
 
@@ -42,7 +50,7 @@ const loginController=async (req,res)=>{
     const {email,password}=req.body;
 
     if(!email || !password){
-        return res.status(400).json({message:"Username and Password required to Login"})
+        return res.status(400).json({message:"Email and Password required to Login"})
     }
 
     const registeredUser=await User.findOne({email})
@@ -61,13 +69,26 @@ const loginController=async (req,res)=>{
         { expiresIn:"1d"}
     )
 
-    res.cookie("token",token)
+    res.cookie("token", token, {
+        httpOnly: true,
+        sameSite: "strict"
+    })
 
     return res.status(200).json({
         message:"User LoggedIn Successfully",
-        user:registeredUser
+        user: sanitizeUser(registeredUser)
     })
 
 }
 
-module.exports={registerController,loginController}
+const logoutController=async(req,res)=>{
+    const user = await User.findOne(req.user.id)
+
+    return res.status(200).json({
+        message:"User data fetched succesfully",
+        user:sanitizeUser(user)
+    })
+}
+
+
+module.exports={registerController,loginController,logoutController}
