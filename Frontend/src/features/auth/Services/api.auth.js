@@ -39,7 +39,7 @@ export async function logout() {
 }
 export async function getMe() {
     try {
-        const response=await api.post("/get-me")
+        const response=await api.get("/get-me")
 
         return response.data;
     } catch (error) {
