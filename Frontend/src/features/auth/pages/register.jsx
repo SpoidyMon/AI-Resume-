@@ -7,25 +7,31 @@ const Register = () => {
 
     // const navigate=Navigate();
 
-    const handleSubmit=(e)=>{
+    const handleSubmit = (e) => {
         e.preventDefault();
         // navigate("/");
-        
+
     }
 
     return (
         <main>
             <div className="form-container">
                 <h1>Register</h1>
-                <form onSubmit={(e)=>handleSubmit(e)}>
-                    <label htmlFor="name">Name</label>
-                    <input id="name" name="name" type="text" required />
+                <form onSubmit={(e) => handleSubmit(e)}>
+                    <div className="input-group">
+                        <label htmlFor="name">Name</label>
+                        <input id="name" name="name" type="text" required />
+                    </div>
 
-                    <label htmlFor="email">Email</label>
-                    <input id="email" name="email" type="email" required />
+                    <div className="input-group">
+                        <label htmlFor="email">Email</label>
+                        <input id="email" name="email" type="email" required />
+                    </div>
 
-                    <label htmlFor="password">Password</label>
-                    <input id="password" name="password" type="password" required />
+                    <div className="input-group">
+                        <label htmlFor="password">Password</label>
+                        <input id="password" name="password" type="password" required />
+                    </div>
 
                     <button className="button primary-button" >Register</button>
                 </form>
