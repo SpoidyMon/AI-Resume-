@@ -2,7 +2,8 @@ const express = require("express");
 const authRouter=require("./routes/auth.route.js")
 const cookieParser=require("cookie-parser")
 const cors =require("cors")
-const geminiResp=require("./Services/api.service.js")
+const geminiResp=require("./Services/api.service.js");
+const { resume, selfDescription, jobDescription } = require("./Services/temp.js");
 
 const app=express();
 app.use(express.json())
@@ -13,7 +14,7 @@ app.use(cors({
 })
 )
 
-geminiResp();
+geminiResp({ resume, selfDescription, jobDescription })
 
 app.use("/api/auth",authRouter);
 
