@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import "../home.scss"
+import "../styles/home.scss"
 
 const Home = () => {
     const [ jobDescription, setJobDescription ] = useState("")
