@@ -17,7 +17,7 @@ app.use(cors({
 
 // geminiResp({ resume, selfDescription, jobDescription })
 
-app.use("/routes/api/auth",authRouter);
-app.use("/routes/interview.routes",InterviewRouter)
+app.use("/api/auth",authRouter);
+app.use("/api/interview",InterviewRouter)
 
 module.exports=app;

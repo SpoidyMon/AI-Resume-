@@ -1,6 +1,6 @@
 import { useContext } from "react"
 import { AuthContext } from "../auth.context"
-import { getMe, login, register } from "../Services/api.auth";
+import { login, logout, register } from "../Services/api.auth";
 
 
 export const useAuth = () => {
@@ -10,7 +10,8 @@ export const useAuth = () => {
         setLoading(true);
         try {
             const response = await login({ email, password });
-            setUser(response.user)
+            setUser(response?.user ?? null)
+            return response
         } catch (error) {
             console.log(error)
         }
@@ -23,7 +24,8 @@ export const useAuth = () => {
         setLoading(true);
         try {
             const response = await register({ username, email, password });
-            setUser(response.user)
+            setUser(response?.user ?? null)
+            return response
         } catch (error) {
             console.log(error)
         }
@@ -34,7 +36,7 @@ export const useAuth = () => {
     const handleLogout=async() => {
         setLoading(true);
         try {
-            await getMe();
+            await logout();
             setUser(null)
         } catch (error) {
             console.log(error)
