@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import '../styles/Interview.scss'
+import { useInterview } from '../hooks/useInterview'
 
 const NAV_ITEMS = [
     {
@@ -32,97 +33,7 @@ const NAV_ITEMS = [
     }
 ]
 
-const STATIC_REPORT = {
-    title: 'Full-Stack Software Developer / Software Engineer',
-    matchScore: 88,
-    technicalQuestions: [
-        {
-            question: 'Explain the Node.js event loop and how it handles asynchronous I/O operations.',
-            intention: "To assess the candidate's deep understanding of Node.js internal architecture and non-blocking I/O.",
-            answer: 'The candidate should explain the different phases of the event loop (timers, pending callbacks, idle/prepare, poll, check, close). They should mention how Libuv handles the thread pool and how the callback queue works with the call stack to ensure performance without blocking the main thread.'
-        },
-        {
-            question: 'How do you optimize a MongoDB aggregation pipeline for high-volume data?',
-            intention: "To test practical experience with database performance and the candidate's claim of reducing response times by 35%.",
-            answer: "Focus on using $match as early as possible to reduce the dataset, ensuring fields used in $match and $sort are indexed, and avoiding $unwind if possible as it inflates the document count. Mention the use of 'explain()' to analyze execution plans."
-        },
-        {
-            question: 'Can you describe the Cache-Aside pattern and when you would use Redis in a Node.js application?',
-            intention: 'Evaluate knowledge of caching strategies and practical Redis implementation for high concurrency.',
-            answer: 'Explain the cache-aside flow: check cache first, on miss query DB and update cache with a TTL. Mention use cases like session caching, API rate limiting, and frequent query caching.'
-        },
-        {
-            question: 'What are the challenges of migrating a monolithic application to a modular service-based architecture?',
-            intention: 'Assess architectural decision-making, distributed system pitfalls, and real-world migration strategies.',
-            answer: 'Highlight data consistency issues across services (saga pattern vs 2PC), network latency, authentication propagation, deployment complexity, and boundary definition.'
-        }
-    ],
-    behavioralQuestions: [
-        {
-            question: 'Tell me about a significant technical challenge you faced in a project.',
-            intention: 'Assess problem-solving approach, diagnostic methodology, and resilience under pressure.',
-            answer: 'Use the STAR method (Situation, Task, Action, Result). Highlight root-cause isolation, architectural trade-offs between speed and reliability, and measurable outcomes achieved.'
-        },
-        {
-            question: 'Describe a situation where you had to learn a new technology quickly.',
-            intention: 'Evaluate learning agility, resourcefulness, and practical implementation under deadlines.',
-            answer: 'Detail your structured framework: reading official documentation, building proof-of-concept tests, stress-testing edge cases, and delivering working functionality incrementally.'
-        },
-        {
-            question: 'How do you handle technical disagreements within an engineering team?',
-            intention: 'Assess emotional intelligence, collaborative decision-making, and communication.',
-            answer: 'Focus on empirical benchmark data rather than subjective opinions. Explore alternatives openly, align on shared project goals, and fully commit once a consensus is reached.'
-        }
-    ],
-    skillGaps: [
-        { skill: 'Message Queues (Kafka/RabbitMQ)', severity: 'high' },
-        { skill: 'Advanced Docker & CI/CD Pipelines', severity: 'medium' },
-        { skill: 'Distributed Systems Design', severity: 'medium' },
-        { skill: 'Production-level Redis management', severity: 'low' }
-    ],
-    preparationPlan: [
-        {
-            day: 1,
-            focus: 'Node.js Internals & Event Loop',
-            tasks: [
-                'Deep dive into Libuv thread pool & phase transitions (timers, poll, check, close).',
-                'Trace event loop execution with microtasks (process.nextTick, Promise) vs macrotasks.'
-            ]
-        },
-        {
-            day: 2,
-            focus: 'MongoDB Aggregation & Indexing',
-            tasks: [
-                'Analyze queries using explain("executionStats") to identify scan bottlenecks.',
-                'Practice compound indexing and early $match/$project pipeline stage optimization.'
-            ]
-        },
-        {
-            day: 3,
-            focus: 'Caching & Redis Architectures',
-            tasks: [
-                'Implement Cache-Aside pattern with automated TTL invalidation.',
-                'Study cache stampede mitigation and Redis rate-limiting algorithms.'
-            ]
-        },
-        {
-            day: 4,
-            focus: 'Distributed Systems & Microservices',
-            tasks: [
-                'Study Saga pattern for distributed transactions across independent services.',
-                'Containerize multi-service application with Docker Compose and health checks.'
-            ]
-        },
-        {
-            day: 5,
-            focus: 'Mock Interviews & Behavioral STAR',
-            tasks: [
-                'Rehearse STAR responses for past production incidents and leadership moments.',
-                'Complete 45-minute timed technical mock interview.'
-            ]
-        }
-    ]
-}
+
 
 const QuestionCard = ({ item, index }) => {
     const [ open, setOpen ] = useState(index < 2)
@@ -172,7 +83,7 @@ const RoadMapDay = ({ day }) => (
 
 const Interview = () => {
     const [ activeNav, setActiveNav ] = useState('technical')
-    const report = STATIC_REPORT
+    const {report} =useInterview()
 
     const scoreColor =
         report.matchScore >= 80 ? 'score--high' :

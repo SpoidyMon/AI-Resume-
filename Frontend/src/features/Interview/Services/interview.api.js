@@ -1,16 +1,18 @@
 import axios from "axios"
 
 const api = axios.create({
-    baseURL: "http://localhost:3000",
+    baseURL: "http://localhost:8080",
     withCredentials: true,
 })
 
-export const generateInterviewReport = async ({ selfDescription, jobDescription, resumefile }) => {
+export const generateInterviewReport = async ({ selfDescription, jobDescription, resumeFile }) => {
 
     const formData = new FormData();
     formData.append("jobDescription", jobDescription)
     formData.append("selfDescription", selfDescription)
-    formData.append("resumefile", resumefile)
+    if (resumeFile) {
+        formData.append("resumefile", resumeFile)
+    }
 
     const response=await api.post("/api/interview",formData,{
         headers:{
@@ -24,7 +26,7 @@ export const generateInterviewReport = async ({ selfDescription, jobDescription,
 
 export const getInterviewReportById=async (interviewId)=>{
 
-    const response =await api.get(`/api/interview/reports/${interviewId}`)
+    const response =await api.get(`/api/interview/report/${interviewId}`)
 
 
     return response.data

@@ -32,4 +32,26 @@ const authuser=async (req,res,next)=>{
 
 }
 
-module.exports={ authuser }
+const optionalAuthuser=async (req,res,next)=>{
+    const token=req.cookies?.token;
+
+    if(!token){
+        return next()
+    }
+
+    const isTokenBlacklisted=await blackListedModel.findOne({token})
+
+    if(isTokenBlacklisted){
+        return next()
+    }
+
+    try {
+        req.user=jwt.verify(token,process.env.JWT_SECRET)
+    } catch (error) {
+        // Treat expired or invalid cookies as an anonymous session.
+    }
+
+    next()
+}
+
+module.exports={ authuser, optionalAuthuser }

@@ -67,7 +67,7 @@ const loginController=async (req,res)=>{
     const token=jwt.sign(
         {id:registeredUser._id,username:registeredUser.username},
         process.env.JWT_SECRET,
-        { expiresIn:"1d"}
+        { expiresIn:"7d"}
     )
 
     res.cookie("token", token, {
@@ -96,6 +96,13 @@ const logoutController=async(req,res)=>{
     })
 }
 const getMeController=async(req,res)=>{
+    if (!req.user) {
+        return res.status(200).json({
+            message:"No authenticated user",
+            user:null
+        })
+    }
+
     const user = await User.findById(req.user.id)
 
     return res.status(200).json({

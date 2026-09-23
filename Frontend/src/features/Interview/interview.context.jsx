@@ -3,7 +3,7 @@ import { createContext, useState } from "react";
 
 export const InterviewContext=createContext()
 
-export const InterviewProvider=({childeren})=>{
+export const InterviewProvider=({ children })=>{
 
     const [loading, setLoading] = useState(false)
     const [report, setReport] = useState(null)
@@ -11,7 +11,7 @@ export const InterviewProvider=({childeren})=>{
 
     return (
         <InterviewContext.Provider value={{loading,setLoading,report,setReport,reports,setReports}}>
-            {childeren}
+            {children}
         </InterviewContext.Provider>
     )
 }

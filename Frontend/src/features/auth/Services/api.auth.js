@@ -43,6 +43,9 @@ export async function getMe() {
 
         return response.data;
     } catch (error) {
-        console.log(error)
+        if (error.response?.status !== 401) {
+            console.error(error)
+        }
+        return null
     }
 }

@@ -1,10 +1,10 @@
 
-import  { useContext } from 'react'
+import  { useContext, useEffect } from 'react'
 import { InterviewContext } from '../interview.context'
-import { generateInterviewReport, getInterviewReportById } from '../Services/interview.api';
+import { generateInterviewReport, getAllInterviewReport, getInterviewReportById } from '../Services/interview.api';
 import { useParams } from 'react-router';
 
-const useInterview = () => {
+export const useInterview = () => {
 
     const context = useContext(InterviewContext);
     const { interviewId } = useParams()
@@ -15,23 +15,25 @@ const useInterview = () => {
 
     const { loading, setLoading, reports, setReports, report, setReport } = context
 
-    const generateReport = async ({ selfDescription, jobDescription, resumefile }) => {
-        setLoading(false)
+    const generateReport = async ({ selfDescription, jobDescription, resumeFile }) => {
+        setLoading(true)
         let response
         try {
-            response = await generateInterviewReport({ selfDescription, jobDescription, resumefile })
-            setReport(response.interviewReport)
+            response = await generateInterviewReport({ selfDescription, jobDescription, resumeFile })
+            if (response?.interviewReport) {
+                setReport(response.interviewReport)
+            }
         } catch (error) {
             console.log("Error in gernerate Report Hook" + error)
         } finally {
-            setLoading(true)
+            setLoading(false)
         }
-        return response.interviewReport
+        return response?.interviewReport ?? null
 
     }
 
     const getReportById = async ({ interviewId }) => {
-        setLoading(false)
+        setLoading(true)
         let response
         try {
             response = await getInterviewReportById(interviewId)
@@ -44,21 +46,28 @@ const useInterview = () => {
     }
 
     const getReports = async () => {
-        setLoading(false)
+        setLoading(true)
         let response
         try {
-            response = await getReports();
-            setReports(response.interviewReports)
+            response = await getAllInterviewReport();
+            setReports(response?.interviewReports ?? [])
             
         } catch (error) {
             console.log("Error in get reports in hook" + error)
         } finally {
-            setLoading(true)
+            setLoading(false)
         }
 
     }
+    useEffect(() => {
+        if (interviewId) {
+            getReportById(interviewId)
+        } else {
+            getReports()
+        }
+    }, [ interviewId ])
+
 
     return { generateReport, getReportById,getReports, report, reports, loading }
 }
 
-export default useInterview

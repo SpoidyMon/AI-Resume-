@@ -1,20 +1,39 @@
 const pdfParse=require("pdf-parse")
+const path=require("path")
+const { pathToFileURL }=require("url")
 const generateInterviewReport=require('../Services/api.service')
 const interviewReportModel=require("../model/interviewReport.model")
 
 const generateInterViewReportController=async(req,res)=>{
-    const resumeContent = await (new pdfParse.PDFParse(Uint8Array.from(req.file.buffer))).getText()
     const {selfDescription,jobDescription} = req.body;
+    let resumeText = "";
+
+    if (req.file) {
+        const parser = new pdfParse.PDFParse({
+            data: Uint8Array.from(req.file.buffer),
+            standardFontDataUrl: pathToFileURL(
+                path.join(__dirname, "../node_modules/pdfjs-dist/standard_fonts/")
+            ).href
+        })
+        const resumeContent = await parser.getText()
+        resumeText = resumeContent.text;
+    }
+
+    if (!jobDescription || (!resumeText && !selfDescription)) {
+        return res.status(400).json({
+            message:"Job description and a resume or self-description are required"
+        })
+    }
 
     const interviewReportByAi=await generateInterviewReport({
-        resume:resumeContent.text,
+        resume:resumeText,
         selfDescription,
         jobDescription,
     })
 
     const interviewReport=await interviewReportModel.create({
         user:req.user._id,
-        resume:resumeContent.text,
+        resume:resumeText,
         selfDescription,
         jobDescription,
         ...interviewReportByAi

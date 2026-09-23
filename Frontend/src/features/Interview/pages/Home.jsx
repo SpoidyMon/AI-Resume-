@@ -1,10 +1,31 @@
 import { useState, useRef } from 'react'
 import "../styles/home.scss"
+import { useNavigate } from 'react-router'
+import { useInterview } from "../hooks/useInterview.js"
 
 const Home = () => {
-    const [ jobDescription, setJobDescription ] = useState("")
-    const [ selfDescription, setSelfDescription ] = useState("")
+    const { loading, generateReport, reports } = useInterview()
+    const [jobDescription, setJobDescription] = useState("")
+    const [selfDescription, setSelfDescription] = useState("")
     const resumeInputRef = useRef()
+
+    const navigate = useNavigate()
+
+    const handleGenerateReport = async () => {
+        const resumeFile = resumeInputRef.current.files[0];
+        const data = await generateReport({ jobDescription, selfDescription, resumeFile });
+        if (data?._id) {
+            navigate(`/interview/${data._id}`)
+        }
+    }
+
+    if (loading) {
+        return (
+            <main className='loading-screen'>
+                <h1>Loadinig you interview plan...</h1>
+            </main>
+        )
+    }
 
     return (
         <div className='home-page'>
@@ -72,11 +93,12 @@ const Home = () => {
                         <div className='self-description'>
                             <label className='section-label' htmlFor='selfDescription'>Quick Self-Description</label>
                             <textarea
+                                style={{ paddingTop: '5px', paddingBottom: '5px' }}
                                 onChange={(e) => { setSelfDescription(e.target.value) }}
                                 value={selfDescription}
                                 id='selfDescription'
                                 name='selfDescription'
-                                className='panel__textarea panel__textarea--short'
+                                className='panel__textarea panel__textarea--short '
                                 placeholder="Briefly describe your experience, key skills, and years of experience if you don't have a resume handy..."
                             />
                         </div>
@@ -94,12 +116,29 @@ const Home = () => {
                 {/* Card Footer */}
                 <div className='interview-card__footer'>
                     <span className='footer-info'>AI-Powered Strategy Generation &bull; Approx 30s</span>
-                    <button className='generate-btn' type='button'>
+                    <button
+                        onClick={handleGenerateReport}
+                        className='generate-btn' type='button'>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" /></svg>
                         Generate My Interview Strategy
                     </button>
                 </div>
             </div>
+            {/* Recent Reports List */}
+            {reports.length > 0 && (
+                <section className='recent-reports'>
+                    <h2>My Recent Interview Plans</h2>
+                    <ul className='reports-list'>
+                        {reports.map(report => (
+                            <li key={report._id} className='report-item' onClick={() => navigate(`/interview/${report._id}`)}>
+                                <h3>{report.title || 'Untitled Position'}</h3>
+                                <p className='report-meta'>Generated on {new Date(report.createdAt).toLocaleDateString()}</p>
+                                <p className={`match-score ${report.matchScore >= 80 ? 'score--high' : report.matchScore >= 60 ? 'score--mid' : 'score--low'}`}>Match Score: {report.matchScore}%</p>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            )}
 
             {/* Page Footer */}
             <footer className='page-footer'>
