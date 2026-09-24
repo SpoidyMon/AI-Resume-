@@ -15,4 +15,6 @@ interviewAiRouter.get("/report/:interviewId",authMiddleWares.authuser,interviewC
 //for getting all reports of a logged in user
 interviewAiRouter.get("/",authMiddleWares.authuser,interviewController.getAllInterViewController)
 
+interviewAiRouter.get("/resume/pdf/:interviewId",authMiddleWares.authuser,interviewController.generateResumePdfController);
+
 module.exports=interviewAiRouter

@@ -74,4 +74,29 @@ const getAllInterViewController=async(req,res)=>{
 
 }
 
-module.exports={ generateInterViewReportController,getAllInterViewController,getInterViewByIdController}
+const generateResumePdfController=async(req,res)=>{
+
+    const {interviewId} = req.params;
+
+    const interviewReport = await interviewReportModel.findById(interviewId);
+
+    if(!interviewReport){
+        res.status(404).json({
+            message:"Interview not found",
+        })
+    }
+
+    const {resume,selfDescription,jobDescription}=interviewReport;
+
+    const pdfbuffer=generateResumePdf({resume,selfDescription,jobDescription});
+
+    res.set({
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename=resume_${interviewReportId}.pdf`
+    })
+
+    res.send(pdfbuffer);
+
+}
+
+module.exports={ generateInterViewReportController,getAllInterViewController,getInterViewByIdController,generateResumePdfController}
