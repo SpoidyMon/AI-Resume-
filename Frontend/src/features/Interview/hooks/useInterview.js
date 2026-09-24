@@ -1,7 +1,7 @@
 
-import  { useContext, useEffect } from 'react'
+import { useContext, useEffect,useState } from 'react'
 import { InterviewContext } from '../interview.context'
-import { generateInterviewReport, getAllInterviewReport, getInterviewReportById } from '../Services/interview.api';
+import { generateInterviewReport, getAllInterviewReport, getInterviewReportById, getResumePdf } from '../Services/interview.api';
 import { useParams } from 'react-router';
 
 export const useInterview = () => {
@@ -51,11 +51,37 @@ export const useInterview = () => {
         try {
             response = await getAllInterviewReport();
             setReports(response?.interviewReports ?? [])
-            
+
         } catch (error) {
             console.log("Error in get reports in hook" + error)
         } finally {
             setLoading(false)
+        }
+
+    }
+
+    const [downloading, setDownloading] = useState(false)
+
+    const getResumePdfById = async ({ interviewId }) => {
+        setDownloading(true)
+        let response = null
+        try {
+            response = await getResumePdf({ interviewId })
+            const blob = response instanceof Blob ? response : new Blob([response], { type: "application/pdf" })
+            const url = window.URL.createObjectURL(blob)
+            const link = document.createElement("a")
+            link.href = url
+            link.setAttribute("download", `resume_${interviewId}.pdf`)
+            document.body.appendChild(link)
+            link.click()
+            link.remove()
+            window.URL.revokeObjectURL(url)
+        }
+        catch (error) {
+            console.error("Error downloading resume:", error)
+            alert("Failed to download resume. Please check the backend console.")
+        } finally {
+            setDownloading(false)
         }
 
     }
@@ -65,9 +91,9 @@ export const useInterview = () => {
         } else {
             getReports()
         }
-    }, [ interviewId ])
+    }, [interviewId])
 
 
-    return { generateReport, getReportById,getReports, report, reports, loading }
+    return { generateReport, getReportById, getReports, report, reports, loading, downloading, getResumePdfById }
 }
 

@@ -1,7 +1,7 @@
 const pdfParse=require("pdf-parse")
 const path=require("path")
 const { pathToFileURL }=require("url")
-const generateInterviewReport=require('../Services/api.service')
+const { generateInterviewReport, generateResumePdf } = require('../Services/api.service')
 const interviewReportModel=require("../model/interviewReport.model")
 
 const generateInterViewReportController=async(req,res)=>{
@@ -49,7 +49,7 @@ const generateInterViewReportController=async(req,res)=>{
 const getInterViewByIdController=async(req,res)=>{
     const {interviewId} =req.params
     
-    const interviewReportById=await interviewReportModel.find({_id:interviewId,user:req.user.id})
+    const interviewReportById=await interviewReportModel.findOne({_id:interviewId,user:req.user.id})
 
     if(!interviewReportById){
         return res.status(404).json({
@@ -59,7 +59,7 @@ const getInterViewByIdController=async(req,res)=>{
 
     res.status(200).json({
         message:"Interview Report found successfully",
-        interviewReport: interviewReportById[0],
+        interviewReport: interviewReportById,
     })
 
 }
@@ -75,27 +75,35 @@ const getAllInterViewController=async(req,res)=>{
 }
 
 const generateResumePdfController=async(req,res)=>{
+    try {
+        const {interviewId} = req.params;
 
-    const {interviewId} = req.params;
+        const interviewReport = await interviewReportModel.findOne({
+            _id: interviewId,
+            user: req.user.id,
+        });
 
-    const interviewReport = await interviewReportModel.findById(interviewId);
+        if(!interviewReport){
+            return res.status(404).json({
+                message:"Interview not found",
+            })
+        }
 
-    if(!interviewReport){
-        res.status(404).json({
-            message:"Interview not found",
+        const {resume,selfDescription,jobDescription}=interviewReport;
+        const pdfbuffer=await generateResumePdf({resume,selfDescription,jobDescription});
+
+        res.set({
+            "Content-Type": "application/pdf",
+            "Content-Disposition": `attachment; filename=resume_${interviewId}.pdf`
+        })
+
+        return res.send(pdfbuffer);
+    } catch (error) {
+        console.error("Error generating resume PDF:", error);
+        return res.status(500).json({
+            message:"Unable to generate resume PDF"
         })
     }
-
-    const {resume,selfDescription,jobDescription}=interviewReport;
-
-    const pdfbuffer=generateResumePdf({resume,selfDescription,jobDescription});
-
-    res.set({
-        "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename=resume_${interviewReportId}.pdf`
-    })
-
-    res.send(pdfbuffer);
 
 }
 

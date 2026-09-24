@@ -51,22 +51,35 @@ Job Description: ${jobDescription}`;
 
 async function generatePdffromHTML(htmlContent){
 
-    const browser=await puppeteer.launch();
-    const page=await browser.newPage();
-    await page.setContent(htmlContent,{waitUntil:"networkidle0"})
+    const browser = await puppeteer.launch({
+        headless: "shell",
+        protocolTimeout: 120000,
+        timeout: 120000,
+        args: [
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+            "--disable-dev-shm-usage",
+            "--disable-gpu",
+            "--no-first-run",
+            "--no-zygote"
+        ]
+    });
+    try {
+        const page = await browser.newPage();
+        await page.setContent(htmlContent, { waitUntil: "domcontentloaded", timeout: 120000 });
 
-    const pdfBuffer=await page.pdf({
-        format:"A4",margin:{
-            top:"20mm",
-            bottom:"20mm",
-            left:"15mm",
-            right:"15mm"
-        }
-    })
-
-    await browser.close();
-    
-    return pdfBuffer;
+        return await page.pdf({
+            format: "A4",
+            margin: {
+                top: "20mm",
+                bottom: "20mm",
+                left: "15mm",
+                right: "15mm"
+            }
+        });
+    } finally {
+        await browser.close();
+    }
 
 }
 
@@ -98,7 +111,7 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
             responseSchema: z.toJSONSchema(resumePdfSchema), // Use z.toJSONSchema here
         }
     })
-    const jsonContent=json.parse(response.text)
+    const jsonContent=JSON.parse(response.text)
     const pdfBuffer= await generatePdffromHTML(jsonContent.html);
 
     return pdfBuffer;
