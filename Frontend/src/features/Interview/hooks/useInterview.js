@@ -7,7 +7,7 @@ import { useParams } from 'react-router';
 export const useInterview = () => {
 
     const context = useContext(InterviewContext);
-    const { interviewId } = useParams()
+    const { id: interviewId } = useParams()
 
     if (!context) {
         throw new Error("useInterview must be with in the Interview Context")
@@ -61,7 +61,7 @@ export const useInterview = () => {
     }
     useEffect(() => {
         if (interviewId) {
-            getReportById(interviewId)
+            getReportById({ interviewId })
         } else {
             getReports()
         }

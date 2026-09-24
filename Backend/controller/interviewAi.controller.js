@@ -32,7 +32,7 @@ const generateInterViewReportController=async(req,res)=>{
     })
 
     const interviewReport=await interviewReportModel.create({
-        user:req.user._id,
+        user:req.user.id,
         resume:resumeText,
         selfDescription,
         jobDescription,
@@ -59,7 +59,7 @@ const getInterViewByIdController=async(req,res)=>{
 
     res.status(200).json({
         message:"Interview Report found successfully",
-        interviewReportById,
+        interviewReport: interviewReportById[0],
     })
 
 }

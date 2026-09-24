@@ -83,7 +83,23 @@ const RoadMapDay = ({ day }) => (
 
 const Interview = () => {
     const [ activeNav, setActiveNav ] = useState('technical')
-    const {report} =useInterview()
+    const { report, loading } = useInterview()
+
+    if (loading) {
+        return (
+            <main className='loading-screen'>
+                <h1>Loading your interview plan...</h1>
+            </main>
+        )
+    }
+
+    if (!report) {
+        return (
+            <main className='loading-screen'>
+                <h1>Interview plan not found.</h1>
+            </main>
+        )
+    }
 
     const scoreColor =
         report.matchScore >= 80 ? 'score--high' :
